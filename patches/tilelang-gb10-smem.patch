@@ -1,0 +1,11 @@
+--- /tmp/tilelang_stock.py	2026-08-27 15:42:17
++++ /tmp/tilelang_patched.py	2026-08-27 15:42:18
+@@ -269,7 +269,7 @@
+     sm_scale=None,
+     is_causal=True,
+     block_I=64,
+-    num_stages=2,
++    num_stages=1,
+     threads=256,
+ ):
+     assert (
