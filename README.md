@@ -11,8 +11,9 @@ This is the official FP8 checkpoint lane: full FP8 weights, FP8 KV cache, and th
 | Single stream decode (streaming ruler, thinking off, temp 0) | 23.7 tok/s |
 | Single stream, client wall including prefill | 23.4 tok/s |
 | Aggregate c2 / c4 / c8 | 28.2 / 42.4 / 60.5 tok/s |
-| KV pool | 1,233,408 FP8 tokens (8.3 GiB) per fleet |
-| Context (this config) | 32,768 (pool supports far deeper; 1M is the model native ceiling) |
+| KV pool | 1,104,000 FP8 tokens at 262K config (4.2 full depth concurrent requests) |
+| Context (this config) | 262,144, gated: cold 169K needle retrieval passed, 3x concurrent 19K prefills survived |
+| Decode at 200K depth | 20.0 tok/s (16 percent below short context; the linear attention layers earn their keep) |
 | MTP accept length, warmed | ~3.8 |
 | Boot | ~20 min (14 weights, 6 graph capture) |
 
@@ -27,6 +28,7 @@ FP8 weights (official checkpoint) + FP8 e4m3 KV cache
 + decode CUDA graphs to bs 8 (prefill graphs auto off for KDA hybrid)
 + chunked prefill 2048 (measured better than 8192 on GB10)
 + mem-fraction-static 0.80, max-running-requests 8
++ context-length 262144 (2^18 exactly: a known upstream graph-replay bug fires only above 2^18 cold prefill, so this cap takes the full window and keeps decode CUDA graphs)
 + reasoning parser glm45, tool call parser glm47
 ```
 

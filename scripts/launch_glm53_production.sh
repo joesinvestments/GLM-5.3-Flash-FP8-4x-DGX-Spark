@@ -3,7 +3,7 @@
 # Verified: c1 23.4 / c4 42.4 / c8 60.5 tok/s agg; decode-only 23.7 (community ruler).
 # FP8 weights + FP8 KV + flashinfer_sparse_mla DSA (sm121 patch stack) + NEXTN adaptive
 # MTP + decode graphs bs<=8 + chunked-prefill 2048 + gmu 0.80 (KV pool 1.23M tok).
-# Full provenance of every flag: ../LEDGER.md. Edit NODES/SSH_HOSTS below for your fabric.
+# Full provenance of every flag: ../CAMPAIGN-LEDGER.md. Run from the Mac.
 set -uo pipefail
 NODES=(192.168.100.11 192.168.100.12 192.168.100.13 192.168.100.14)
 SSH_HOSTS=(gx10-1 gx10-2 gx10-3 gx10-4)
@@ -67,7 +67,7 @@ SERVE=(
   # (AttributeError 'runner', boot 3 2026-08-27); it is an NVFP4-lane lever only.
   --tool-call-parser glm47
   --chunked-prefill-size 2048
-  --context-length 32768
+  --context-length 262144
   --max-running-requests 8
   --mem-fraction-static 0.80
 )

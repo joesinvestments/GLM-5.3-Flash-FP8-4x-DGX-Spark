@@ -157,3 +157,13 @@ Pass via chat_template_kwargs on every request unless a specific call needs othe
 Upstream sync check 2026-08-27: all serving files byte-identical to zai-org/GLM-5.3-Flash
 (tokenizer sha256 19e77364 verified); only README changed. Fleet-kit watch now covers
 3 HF + 10 GH repos + 4 issue threads (fleet glm53-flash upstream).
+
+## 262K PRODUCTION GATE (boot 10, 2026-08-27 evening) - PASSED, config promoted
+--context-length 262144 (= 2^18 exactly: the sglang #36550 graph-replay bug fires only
+ABOVE 2^18 cold prefill, so this cap takes the full window while keeping decode graphs).
+KV pool at 262K: 1,104,000 fp8 tokens (4.2 full-depth concurrent). Gates: cold 169K
+needle PASS (318s, ~531 tok/s effective prefill); 3x concurrent 19K prefills survived
+(~54s each); decode at 200K depth 20.0 tok/s vs 23.7 short-context (16% decay - the
+linear-attention half earning its keep); short-ctx c1 20.3 cold, warms to ~23 band.
+Production launcher now ships 262144. Past 262K requires the upstream #36550 fix
+(watched) or graphs off (~40% decode cost).
