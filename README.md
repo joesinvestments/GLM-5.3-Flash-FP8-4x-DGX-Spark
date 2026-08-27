@@ -49,6 +49,7 @@ Operational notes that each cost us a boot or worse: drop the page cache before 
 - [0xSero](https://github.com/0xSero/glm-5.3-flash-sglang-sm120) for the six sm12x compatibility patches this image bakes in, and the sm121 bundle lineage
 - [tonyd2wild](https://github.com/tonyd2wild/GLM-5.3-Flash-NVFP4-2x-DGX-Spark) for the GB10 KV sizing doctrine, the cache flusher finding, and the parallel vLLM lane diagnosis
 - [Light Foundry](https://x.com/light_foundry) for the chunked prefill 2048 finding on GB10 and the 8-Spark TP8 reference numbers
+- [Lucas Fulks](https://x.com/lucasfulks) and [CosmicRaisins](https://github.com/CosmicRaisins) for the first native FP8 fleet numbers on 4x Spark, which set the bar this recipe chased
 - The vLLM PR [#53906](https://github.com/vllm-project/vllm/pull/53906) authors for the day-0 vLLM lane; our three sm121 failure reports from that lane are in the ledger and filed upstream
 
 ## License
