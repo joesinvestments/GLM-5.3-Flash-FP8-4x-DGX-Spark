@@ -19,6 +19,21 @@ This is the official FP8 checkpoint lane: full FP8 weights, FP8 KV cache, and th
 
 For calibration against the field on the same hardware class: the accepted 4-Spark TP4 evidence in the community bundle this builds on reports C1 22.69 tok/s. Unpublished configs report 30 to 33. An 8-Spark TP8 deployment of the same lane reports c1 74. Losing attempts are in the ledger, including a MoE tile tune that made everything 10 percent slower and was reverted.
 
+## DFlash 2 update (deployed same day as the drafter release)
+
+The [incoai/GLM-5.3-Flash-DFlash2](https://huggingface.co/incoai/GLM-5.3-Flash-DFlash2) block-diffusion drafter now runs on this fleet, replacing the native MTP head. Warmed, thinking off, temperature 0, streaming decode ruler, single stream:
+
+| Output regime | DFlash 2 | vs MTP |
+|---|---|---|
+| Structured (counting, lists) | 48.1 tok/s | MTP cell not measured |
+| GSM8K style math | 46.3 tok/s | MTP cell not measured |
+| Code continuation | 32.4 tok/s | 23.7 on the same ruler, a 1.37x gain that matches the author's own 1.35x HumanEval figure |
+| Freeform prose | 18.6 tok/s | acceptance runs cold on prose |
+
+Read the headline numbers carefully: the widely quoted 2.8x for DFlash 2 is versus plain autoregressive decoding. If you already run MTP, the honest gain is 1.27 to 1.36x from the author's own tables, and that is what we reproduce. Aggregate at c8 is unchanged (59.7 vs 60.5); the win is single stream and small-batch, which is where agent traffic lives.
+
+Build notes: requires SGLang PR 36708 (merged to the GLM support branch) plus the still open PR 36755 mHC capture fix; fa4 draft attention runs on sm121 and quietly keeps its draft KV in bf16 while the target pool stays FP8 (724,608 tokens at this config). First measurement after boot read only +11 percent: DFlash acceptance takes minutes to warm, never benchmark a cold spec-decode server. Full detail in [LEDGER.md](LEDGER.md).
+
 ## The formula
 
 ```

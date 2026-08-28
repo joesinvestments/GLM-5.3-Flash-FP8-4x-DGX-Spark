@@ -167,3 +167,28 @@ needle PASS (318s, ~531 tok/s effective prefill); 3x concurrent 19K prefills sur
 linear-attention half earning its keep); short-ctx c1 20.3 cold, warms to ~23 band.
 Production launcher now ships 262144. Past 262K requires the upstream #36550 fix
 (watched) or graphs off (~40% decode cost).
+
+## DFlash 2 (boot 11, 2026-08-27/28) - deployed same day as drafter release
+Drafter: incoai/GLM-5.3-Flash-DFlash2 (2.2G, CC BY-NC-ND research eval). Engine: boot8
+image + stock glm5_next + sglang PR 36708 (GLM hidden-state capture, merged 08-27 into
+the glm support branch) + PR 36755 (mHC capture fix, OPEN - unmerged patch in serving
+path, watched). fa4 draft attention RUNS on sm121 (cute-DSL sm120-family kernel); it
+overrides only the DRAFT KV to bf16, target pool stays fp8 at 724,608 tokens (2.7 full
+262K requests; drafter + draft-KV cost vs boot 10's 1.104M).
+
+Measured (warmed, thinking off, temp 0, streaming ruler):
+| regime | DFlash2 | note |
+| structured (count) | 48.1 | agentic-class output |
+| gsm8k-style math | 46.3 | |
+| code continuation | 32.4 | comparable MTP mark 23.7 -> 1.37x, matches author's 1.35x HumanEval c1 |
+| freeform prose | 18.6 | |
+| c4 / c8 aggregate (generic, thinking on) | 44.6 / 59.7 | vs MTP 42.4 / 60.5 |
+
+LESSON REPEATED AND PAID FOR: first measurement (26.2, +11%) was taken minutes after
+boot with cold acceptance - the exact cold-vs-warm trap already written in this ledger
+at boot 10. Author's "2.8x" headline is vs plain autoregressive; vs MTP his own tables
+say 1.27-1.36x c1, which we reproduce. vLLM's spec-decode blog (2026-08-23) confirms:
+method gains are model+workload properties (DFlash 1.08x-2.87x across families), tune
+proposal length per workload watching per-position acceptance.
+NEXT LEVER: DFlash block-size sweep (5/6/7/8) regime-matched; add per-position
+acceptance to fleet-kit bench cells.

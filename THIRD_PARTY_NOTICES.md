@@ -10,4 +10,6 @@
 | GB10 operational doctrine | Cache flusher, KV sizing, boot rules cited in README/LEDGER | [tonyd2wild/GLM-5.3-Flash-NVFP4-2x-DGX-Spark](https://github.com/tonyd2wild/GLM-5.3-Flash-NVFP4-2x-DGX-Spark) | MIT |
 | Chunked prefill 2048 finding | Serve flag adopted from published measurement | [Light Foundry](https://x.com/light_foundry) | n/a (published finding, credited) |
 | First 4x Spark native FP8 numbers | Calibration targets in LEDGER | [Lucas Fulks](https://x.com/lucasfulks), [CosmicRaisins](https://github.com/CosmicRaisins) | n/a (published findings, credited) |
+| DFlash 2 drafter | Speculative draft model served by boot 11 (not redistributed) | [incoai/GLM-5.3-Flash-DFlash2](https://huggingface.co/incoai/GLM-5.3-Flash-DFlash2) | CC BY-NC-ND 4.0 |
+| DFlash 2 SGLang integration | PRs applied in docker build | [sgl-project/sglang PR 36708](https://github.com/sgl-project/sglang/pull/36708), [PR 36755](https://github.com/sgl-project/sglang/pull/36755) | Apache-2.0 |
 | vLLM day-0 GLM-5.3 lane | Failure analysis in LEDGER, issues filed upstream | [vllm-project/vllm PR #53906](https://github.com/vllm-project/vllm/pull/53906) | Apache-2.0 |
