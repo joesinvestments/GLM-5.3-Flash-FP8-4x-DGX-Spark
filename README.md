@@ -2,7 +2,16 @@
 
 Serving [zai-org/GLM-5.3-Flash](https://huggingface.co/zai-org/GLM-5.3-Flash) (320B total / 18B active MoE, native FP8, released 2026-08-26) across four DGX Spark nodes at tensor parallel 4 via SGLang, one day after the model dropped.
 
-This is the official FP8 checkpoint lane: full FP8 weights, FP8 KV cache, and the model's native MTP draft head, on the day-0 SGLang image plus one community patch stack and one kernel patch of ours.
+This is the official FP8 checkpoint lane: full FP8 weights, FP8 KV cache, and the model's native adaptive NEXTN/MTP draft head, on the day-0 SGLang image plus one community patch stack and one kernel patch of ours.
+
+The qualified live configuration is the four-Spark adaptive NEXTN/MTP service.
+The 2026-08-29 DFlash2 A/B was restored to NEXTN after DFlash2 lost by 29.2%
+at one stream and 27.2% at concurrency four. A separate, evaluation-only
+[two-Spark EXL3 + DFlash2 + Abliterated-on lane](experiments/exl3-2x-abliterated/README.md)
+is retained so that checkpoint/runtime alternatives can be reproduced without
+changing the qualified service. Its 2026-08-30 A/B completed 20/20 AE jobs but
+doubled median job latency and failed one exact reducer contract, so it was not
+promoted.
 
 ## Numbers
 
@@ -19,9 +28,9 @@ This is the official FP8 checkpoint lane: full FP8 weights, FP8 KV cache, and th
 
 For calibration against the field on the same hardware class: the accepted 4-Spark TP4 evidence in the community bundle this builds on reports C1 22.69 tok/s. Unpublished configs report 30 to 33. An 8-Spark TP8 deployment of the same lane reports c1 74. Losing attempts are in the ledger, including a MoE tile tune that made everything 10 percent slower and was reverted.
 
-## DFlash 2 update (deployed same day as the drafter release)
+## DFlash 2 historical experiment
 
-The [incoai/GLM-5.3-Flash-DFlash2](https://huggingface.co/incoai/GLM-5.3-Flash-DFlash2) block-diffusion drafter now runs on this fleet, replacing the native MTP head. Warmed, thinking off, temperature 0, streaming decode ruler, single stream:
+The first [incoai/GLM-5.3-Flash-DFlash2](https://huggingface.co/incoai/GLM-5.3-Flash-DFlash2) experiment produced the following regime-specific measurements. Those numbers are historical, not the current fleet state:
 
 | Output regime | DFlash 2 | vs MTP |
 |---|---|---|
@@ -32,7 +41,7 @@ The [incoai/GLM-5.3-Flash-DFlash2](https://huggingface.co/incoai/GLM-5.3-Flash-D
 
 Read the headline numbers carefully: the widely quoted 2.8x for DFlash 2 is versus plain autoregressive decoding. If you already run MTP, the honest gain is 1.27 to 1.36x from the author's own tables, and that is what we reproduce. Aggregate at c8 is unchanged (59.7 vs 60.5); the win is single stream and small-batch, which is where agent traffic lives.
 
-Build notes: requires SGLang PR 36708 (merged to the GLM support branch) plus the still open PR 36755 mHC capture fix; fa4 draft attention runs on sm121 and quietly keeps its draft KV in bf16 while the target pool stays FP8 (724,608 tokens at this config). First measurement after boot read only +11 percent: DFlash acceptance takes minutes to warm, never benchmark a cold spec-decode server. Full detail in [LEDGER.md](LEDGER.md).
+Build notes: the historical lane required SGLang PR 36708 plus the then-open PR 36755 mHC capture fix; fa4 draft attention ran on sm121 and kept its draft KV in bf16 while the target pool stayed FP8. A later matched A/B on 2026-08-29 measured 25.24 tok/s versus 35.63 for adaptive NEXTN/MTP at one stream, and 52.82 versus 72.57 tok/s at concurrency four, so the fleet was restored to NEXTN. Full detail is in [LEDGER.md](LEDGER.md).
 
 ## The formula
 

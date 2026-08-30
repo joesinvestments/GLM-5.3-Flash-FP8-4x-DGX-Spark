@@ -168,7 +168,7 @@ linear-attention half earning its keep); short-ctx c1 20.3 cold, warms to ~23 ba
 Production launcher now ships 262144. Past 262K requires the upstream #36550 fix
 (watched) or graphs off (~40% decode cost).
 
-## DFlash 2 (boot 11, 2026-08-27/28) - deployed same day as drafter release
+## DFlash 2 (boot 11, 2026-08-27/28) - historical deployment
 Drafter: incoai/GLM-5.3-Flash-DFlash2 (2.2G, CC BY-NC-ND research eval). Engine: boot8
 image + stock glm5_next + sglang PR 36708 (GLM hidden-state capture, merged 08-27 into
 the glm support branch) + PR 36755 (mHC capture fix, OPEN - unmerged patch in serving
@@ -192,3 +192,12 @@ method gains are model+workload properties (DFlash 1.08x-2.87x across families),
 proposal length per workload watching per-position acceptance.
 NEXT LEVER: DFlash block-size sweep (5/6/7/8) regime-matched; add per-position
 acceptance to fleet-kit bench cells.
+
+### Matched A/B correction (2026-08-29/30)
+
+A later warmed, prompt-matched A/B supersedes the promotion implication above.
+Adaptive native NEXTN/MTP measured 35.63 tok/s single-stream and 72.57 tok/s
+aggregate at concurrency four. DFlash2 measured 25.24 and 52.82 tok/s,
+respectively (-29.2% and -27.2%). Sustained acceptance was about 0.12-0.17,
+with only 1.8-2.2 accepted tokens from the eight-token verify window. The
+qualified four-Spark service was restored to adaptive NEXTN/MTP 5/1/6.

@@ -1,0 +1,30 @@
+diff --git a/start.sh b/start.sh
+index 063993e..69ec3ea 100755
+--- a/start.sh
++++ b/start.sh
+@@ -153,6 +153,7 @@ MTP_TOKENS="${MTP_TOKENS:-2}"
+ SPEC_METHOD="${SPEC_METHOD:-dflash}"
+ DFLASH_MODEL="${DFLASH_MODEL:-incoai/GLM-5.3-Flash-DFlash2}"
+ DFLASH_CACHE_NAME="${DFLASH_CACHE_NAME:-models--${DFLASH_MODEL//\//--}}"
++DFLASH_REVISION="${DFLASH_REVISION:-}"
+ DFLASH_TOKENS="${DFLASH_TOKENS:-7}"
+ # 2 = shard the ~2.3 GiB DFlash2 drafter across TP (C4 keep, 2026-08-30:
+ # idle 8k 938 / 16k 972 / 100k 997; decode structured 65.1 / prose 27.1).
+@@ -696,6 +697,7 @@ download_dflash() {
+     [ "$SPEC_METHOD" = "dflash" ] || return 0
+     [ "${SKIP_DOWNLOAD:-0}" = "1" ] && { log "SKIP_DOWNLOAD=1 — skipping DFlash2 download check"; return; }
+     local have
++    local -a args=()
+     have="$(find "$DFLASH_PATH/snapshots" -name 'model.safetensors' 2>/dev/null | wc -l | tr -d '[:space:]' || true)"
+     if [ "${have:-0}" -ge 1 ] && [ "${REFRESH_WEIGHTS:-0}" != "1" ]; then
+         log "DFlash2 already present: $DFLASH_PATH"
+@@ -706,7 +708,8 @@ download_dflash() {
+     resolve_hf_bin || die "no 'hf' / 'huggingface-cli' on PATH and no python huggingface_hub — pip install --user -U 'huggingface_hub[cli]' (or set HF_BIN=/path/to/hf)"
+     mkdir -p "$HF_CACHE_DIR"
+     log "downloading ${DFLASH_MODEL} (~2.3 GiB) into ${HF_CACHE_DIR} ..."
+-    HF_HOME="$HF_CACHE_DIR" "${HF_BIN_CMD[@]}" download "$DFLASH_MODEL"
++    [ -n "$DFLASH_REVISION" ] && args+=(--revision "$DFLASH_REVISION")
++    HF_HOME="$HF_CACHE_DIR" "${HF_BIN_CMD[@]}" download "$DFLASH_MODEL" "${args[@]}"
+     ensure_dflash_refs_main
+     have="$(find "$DFLASH_PATH/snapshots" -name 'model.safetensors' 2>/dev/null | wc -l | tr -d '[:space:]' || true)"
+     [ "${have:-0}" -ge 1 ] || die "DFlash2 download finished without model.safetensors"
